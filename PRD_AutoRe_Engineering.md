@@ -72,6 +72,33 @@ AutoRe 是面向房屋检测/危房鉴定场景的垂直 Agent 平台，核心�
 2. 外部开放 API 产品化（鉴权套餐、SLA 合同化）。
 3. 复杂权限中心（RBAC/ABAC 全量实现）。
 
+### 3.5 功能清单（MVP执行版）
+> 优先级口径：`P0`=MVP阶段必须完成；`P1`=第一版可交付建议完成；`P2`=后续扩展能力。
+
+| 一级模块 | 二级子模块 | 功能点 | 功能描述 | 项目总体优先级 | MVP阶段开发优先级 | 实现方式 |
+|---|---|---|---|---|---|---|
+| 项目与任务上下文 | 项目范围绑定 | `project_id` 贯穿 | 上传、解析、入库、生成全链路绑定项目范围 | P0 | P0 | 前后端 |
+| 数据采集 | 文件上传 | 上传PDF/图片 | 支持检测资料上传并生成 `object_key/source_hash` | P0 | P0 | 前后端 |
+| 数据采集 | 内容解析 | 页图解析与证据定位 | 将源文件解析为页级内容，产出 `evidence_refs`（page级） | P0 | P0 | 后端 |
+| 数据采集 | Skill执行 | 声明式采集Skill运行 | 运行 `concrete/mortar/brick` 等采集技能抽取结构化结果 | P0 | P0 | 后端 |
+| 数据采集 | 人工确认 | 确认后入库 | 用户确认后写入 `professional_data`，未确认不落库 | P0 | P0 | 前后端 |
+| 数据治理 | 映射标准化 | Mapping到统一载荷 | 将各技能输出映射到统一数据契约 | P0 | P0 | 后端 |
+| 数据治理 | 校验门禁 | Validation校验 | 必填/类型/规则校验，不通过禁止自动落库 | P0 | P0 | 后端 |
+| 字段体系 | 三层字段库 | Layer1/2/3落库策略 | Layer1存JSON；Layer2/3关键字段必须独立列 | P0 | P0 | 后端 |
+| 报告编辑 | 章节节点 | `report`节点管理 | 支持章节节点创建、编辑、删除与排序（内部） | P0 | P0 | 前端 |
+| 报告编辑 | 章节配置 | 单下拉 `templateStyle` | 以“检测大类/数据用途”单下拉配置章节数据来源 | P0 | P0 | 前端 |
+| 报告编辑 | 自动映射 | `templateStyle -> sourceNodeId -> dataset_key` | 根据配置自动选择章节生成数据范围与处理函数 | P0 | P0 | 前后端 |
+| 报告生成 | 章节生成 | 按 `dataset_key` 生成章节 | 调用对应 generation skill 输出 `blocks` | P0 | P0 | 后端 |
+| 报告生成 | 预览展示 | 章节预览渲染 | 支持文本/表格/键值块预览 | P0 | P0 | 前端 |
+| 运行审计 | Run Log | 阶段日志记录 | 记录 `ingest/parse/mapping/validation/persist/chapter_generation` | P0 | P0 | 后端 |
+| 模板策略 | 模板注册 | `template_registry` 管理 | 管理模板与映射规则，支撑稳定复用 | P1 | P1 | 后端 |
+| 技能资产 | Prompt版本 | prompt/version登记 | 记录 skill prompt 版本，支持追溯与回滚 | P1 | P1 | 后端 |
+| 可靠性 | 失败恢复 | 重试与错误回传 | 关键失败节点可重试，前端可见错误原因 | P1 | P1 | 前后端 |
+| 运营效率 | 生成历史 | 历史任务查看 | 查看历史生成记录与状态（MVP简版） | P1 | P1 | 前端 |
+| 能力扩展 | 新检测项接入 | 新skill注册扩展 | 新增检测项通过新增skill+注册实现扩展 | P2 | - | 后端 |
+| 能力扩展 | 多报告类型 | 民标/工标扩展 | 在不破坏危房链路前提下扩展新模板策略 | P2 | - | 前后端 |
+| 平台化 | 多租户与权限 | 租户/角色体系 | SaaS化所需租户隔离与权限体系 | P2 | - | 前后端 |
+
 ## 4. 角色与典型场景
 | 角色 | 核心诉求 | 关键操作 |
 |---|---|---|
@@ -202,7 +229,7 @@ F --> G[返回 chapters 供预览与导出]
 | `opinion_and_suggestions` | `generate_opinion_and_suggestions_async` | 鉴定意见与建议章节（静态模板优先） | `text` | 可选 |
 
 #### 7.4.4 统一约束（开发执行）
-1. Skill 输入输出必须受 JSON Schema 约束（见附录 D 的 I/O 契约）。
+1. Skill 输入输出必须受 JSON Schema 约束（唯一详细定义见 `AutoRe_Skill_Prompt_Spec.md`，附录 D 仅保留索引）。
 2. 所有 skill 执行必须写 `run_log`（至少包含 `run_id/stage/status/error_message`）。
 3. `validation` 未通过的数据不得自动落库，只能走人工确认路径。
 4. Generation skill 输出必须可归一为 `blocks` 结构（`text/table/kv_list/note`）。
@@ -416,6 +443,7 @@ F --> G[返回 chapters 供预览与导出]
 2. 若发生线上事故或交付风险，可优先回到已拍板基线，避免临时扩大范围。
 
 ## 15. 附录 A：关键 JSON Schema（当前）
+> 边界：本附录仅保留系统/业务公共 Schema 摘要；Skill 级 I/O 与 Prompt Schema 统一在 `AutoRe_Skill_Prompt_Spec.md` 维护。
 ### 15.1 `professional_data.json`（摘要）
 - required: `test_item`, `test_result`, `test_unit`, `evidence_refs`
 - 关键属性: `component_type`, `location`, `source_hash`, `confidence`
@@ -627,220 +655,56 @@ Response Schema：
 }
 ```
 
-## 18. 附录 D：Skill I/O 契约（开发与测试基线）
-### 18.1 Imperative Skills
-#### `IngestSkill.execute(upload, project_id)`
-Input：
-```json
-{
-  "type": "object",
-  "required": ["upload", "project_id"],
-  "properties": {
-    "upload": { "type": "object", "description": "UploadFile" },
-    "project_id": { "type": "string" }
-  }
-}
-```
-Output：
-```json
-{
-  "type": "object",
-  "required": ["project_id", "object_key", "source_hash", "filename"],
-  "properties": {
-    "project_id": { "type": "string" },
-    "object_key": { "type": "string" },
-    "source_hash": { "type": "string" },
-    "filename": { "type": "string" }
-  }
-}
-```
+## 18. 附录 D：Skill I/O 契约索引（去重版）
+> 目的：避免 PRD 与 `AutoRe_Skill_Prompt_Spec.md` 双份维护造成漂移。
+>
+> 规则：
+> 1. **唯一详细定义（SSOT）**：`AutoRe_Skill_Prompt_Spec.md`
+> 2. 本附录仅保留“索引 + 使用规范 + 验收口径”，不再内嵌完整 JSON Schema。
+> 3. 若 PRD 与 Spec 冲突，以 Spec 为准，PRD 需在同版本内同步修订说明。
 
-#### `ParseSkill.execute(ingest_result, use_llm, prompt)`
-Input：
-```json
-{
-  "type": "object",
-  "required": ["ingest_result"],
-  "properties": {
-    "ingest_result": {
-      "type": "object",
-      "required": ["object_key", "source_hash"]
-    },
-    "use_llm": { "type": "boolean" },
-    "prompt": { "type": "string" }
-  }
-}
-```
-Output：
-```json
-{
-  "type": "object",
-  "required": ["parse_id", "object_key", "source_hash", "file_type", "page_images", "evidence_refs", "structured_data"],
-  "properties": {
-    "parse_id": { "type": "string" },
-    "object_key": { "type": "string" },
-    "source_hash": { "type": "string" },
-    "file_type": { "type": "string", "enum": ["pdf", "image"] },
-    "page_images": { "type": "array", "items": { "type": "string" } },
-    "page_paths": { "type": "array", "items": { "type": "string" } },
-    "evidence_refs": { "type": "array" },
-    "structured_data": { "type": "object" },
-    "llm_usage": { "type": "object" }
-  }
-}
-```
+### 18.1 契约索引
+#### 18.1.1 通用契约（Spec 第3章）
+- `EvidenceRef`：`AutoRe_Skill_Prompt_Spec.md` -> `3.1 EvidenceRef（MVP）`
+- `GenerationBlock`：`AutoRe_Skill_Prompt_Spec.md` -> `3.2 GenerationBlock（标准化目标）`
+- `GenerationCanonicalOutput`：`AutoRe_Skill_Prompt_Spec.md` -> `3.3 GenerationCanonicalOutput（推荐）`
 
-#### `MappingSkill.execute(...)`
-Input（摘要）：
-```json
-{
-  "type": "object",
-  "required": ["project_id", "node_id", "source_hash", "structured_data"],
-  "properties": {
-    "project_id": { "type": "string" },
-    "node_id": { "type": "string" },
-    "source_hash": { "type": "string" },
-    "structured_data": {},
-    "evidence_refs": { "type": "array" },
-    "run_id": { "type": "string" },
-    "test_item_override": { "type": "string" },
-    "mapping_override": { "type": "object" }
-  }
-}
-```
-Output：
-```json
-{
-  "type": "object",
-  "required": ["mapped", "meta"],
-  "properties": {
-    "mapped": {
-      "type": "object",
-      "required": [
-        "project_id", "node_id", "test_item", "evidence_refs", "raw_result",
-        "source_prompt_version", "schema_version", "source_hash"
-      ]
-    },
-    "meta": { "type": "object" }
-  }
-}
-```
+#### 18.1.2 Declarative Skills I/O（Spec 第4章）
+- `concrete_table_recognition`：`#skill-concrete_table_recognition-io`
+- `mortar_table_recognition`：`#skill-mortar_table_recognition-io`
+- `brick_table_recognition`：`#skill-brick_table_recognition-io`
+- `delegate_info_recognition`：`#skill-delegate_info_recognition-io`
+- `software_calculation_recognition`：`#skill-software_calculation_recognition-io`
 
-#### `ValidationSkill.execute(payload, meta)`
-Input：
-```json
-{
-  "type": "object",
-  "required": ["payload"],
-  "properties": {
-    "payload": { "type": "object" },
-    "meta": { "type": "object" }
-  }
-}
-```
-Output：
-```json
-{
-  "type": "object",
-  "required": ["is_valid", "errors", "warnings", "normalized", "policy"],
-  "properties": {
-    "is_valid": { "type": "boolean" },
-    "errors": { "type": "array", "items": { "type": "string" } },
-    "warnings": { "type": "array", "items": { "type": "string" } },
-    "normalized": { "type": "object" },
-    "policy": { "type": "object" }
-  }
-}
-```
+#### 18.1.3 Generation Skills I/O（Spec 第5章）
+- `parse_concrete_strength`：`#skill-parse_concrete_strength-io`
+- `parse_mortar_strength`：`#skill-parse_mortar_strength-io`
+- `parse_brick_strength`：`#skill-parse_brick_strength-io`
+- `generate_inspection_content_and_methods_async`：`#skill-generate_inspection_content_and_methods_async-io`
+- `generate_inspection_basis_async`：`#skill-generate_inspection_basis_async-io`
+- `generate_detailed_inspection_async`：`#skill-generate_detailed_inspection_async-io`
+- `generate_basic_situation_async`：`#skill-generate_basic_situation_async-io`
+- `generate_house_overview_async`：`#skill-generate_house_overview_async-io`
+- `generate_load_calc_params_async`：`#skill-generate_load_calc_params_async-io`
+- `generate_bearing_capacity_review_async`：`#skill-generate_bearing_capacity_review_async-io`
+- `generate_analysis_explanation_async`：`#skill-generate_analysis_explanation_async-io`
+- `generate_opinion_and_suggestions_async`：`#skill-generate_opinion_and_suggestions_async-io`
 
-### 18.2 Declarative Skill Executor（通用）
-`DeclarativeSkillExecutor.execute(skill_name, user_input, context, use_llm, use_script, ...)`
+### 18.2 去重后的职责分工
+| 文档 | 保留内容 | 不再保留 |
+|---|---|---|
+| `PRD_AutoRe_Engineering.md` | 业务范围、流程、MVP边界、接口级契约、执行约束、索引 | Skill 级完整 I/O JSON、逐技能 Prompt 正文 |
+| `AutoRe_Skill_Prompt_Spec.md` | Skill 级 Input/Output Schema、Prompt 模板、变量、失败策略、验收 | 产品范围与业务流程描述 |
 
-Output 契约：
-```json
-{
-  "type": "object",
-  "required": ["skill_name", "metadata"],
-  "properties": {
-    "skill_name": { "type": "string" },
-    "llm_response": { "type": ["object", "null"] },
-    "script_result": {
-      "type": ["object", "null"],
-      "properties": {
-        "success": { "type": "boolean" },
-        "returncode": { "type": "integer" },
-        "output": {},
-        "stdout": { "type": "string" },
-        "stderr": { "type": "string" },
-        "error": { "type": "string" }
-      }
-    },
-    "metadata": {
-      "type": "object",
-      "required": ["name", "description", "version"]
-    }
-  }
-}
-```
+### 18.3 变更流程（防漂移）
+1. 先改 `AutoRe_Skill_Prompt_Spec.md`（schema_version/prompt_version/changelog）。
+2. 再检查 PRD 第7章和本附录索引是否需要更新。
+3. 联调/测试基线以 Spec 为准执行。
 
-### 18.3 Generation Skill（章节类）统一输出契约
-> 适用于 `dataset_key` 驱动的章节技能返回结构。
-```json
-{
-  "type": "object",
-  "properties": {
-    "dataset_key": { "type": "string" },
-    "chapter_type": { "type": "string" },
-    "chapter_title": { "type": "string" },
-    "chapter_number": { "type": "string" },
-    "content": { "type": "string" },
-    "table": { "type": "object" },
-    "sections": { "type": "array" },
-    "items": { "type": "array" },
-    "meta": { "type": "object" },
-    "generation_metadata": { "type": "object" },
-    "has_data": { "type": "boolean" }
-  }
-}
-```
-
-### 18.4 入库前标准化 Record 契约（建议统一）
-```json
-{
-  "type": "object",
-  "required": [
-    "project_id", "node_id", "test_item", "evidence_refs",
-    "raw_result", "source_prompt_version", "schema_version", "source_hash"
-  ],
-  "properties": {
-    "project_id": { "type": "string" },
-    "node_id": { "type": "string" },
-    "run_id": { "type": ["string", "null"] },
-    "test_item": { "type": "string" },
-    "test_result": { "type": ["number", "null"] },
-    "test_unit": { "type": ["string", "null"] },
-    "record_code": { "type": ["string", "null"] },
-    "test_location_text": { "type": ["string", "null"] },
-    "design_strength_grade": { "type": ["string", "null"] },
-    "strength_estimated_mpa": { "type": ["number", "null"] },
-    "carbonation_depth_avg_mm": { "type": ["number", "null"] },
-    "test_date": { "type": ["string", "null"] },
-    "casting_date": { "type": ["string", "null"] },
-    "test_value_json": { "type": ["object", "null"] },
-    "component_type": { "type": ["string", "null"] },
-    "location": { "type": ["object", "null"] },
-    "evidence_refs": { "type": "array" },
-    "raw_result": { "type": "object" },
-    "confirmed_result": { "type": ["object", "null"] },
-    "result_version": { "type": "integer" },
-    "source_prompt_version": { "type": "string" },
-    "schema_version": { "type": "string" },
-    "raw_hash": { "type": ["string", "null"] },
-    "input_fingerprint": { "type": ["string", "null"] },
-    "source_hash": { "type": "string" },
-    "confidence": { "type": ["number", "null"] }
-  }
-}
-```
+### 18.4 MVP 验收口径（契约一致性）
+- PRD 第7章 skill 列表与 Spec 中 skill_id 必须一一对应。
+- 运行链路使用的 I/O 字段必须可在 Spec 中定位到定义。
+- 禁止在 PRD 新增独立的 Skill 级完整 JSON Schema（避免重复源）。
 
 本 PRD 采用“现状可执行 + 治理可演进”模式，可直接指导开发与后续版本迭代。
+

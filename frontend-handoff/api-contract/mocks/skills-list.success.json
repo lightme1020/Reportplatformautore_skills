@@ -1,0 +1,9 @@
+﻿{
+  "imperative": [],
+  "declarative": [
+    "concrete_table_recognition",
+    "mortar_table_recognition",
+    "brick_table_recognition",
+    "software_calculation_recognition"
+  ]
+}

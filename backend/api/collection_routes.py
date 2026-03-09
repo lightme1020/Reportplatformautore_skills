@@ -37,6 +37,120 @@ ALLOWED_MIME_TYPES = {
 }
 MAX_FILE_SIZE = 50 * 1024 * 1024
 
+COLLECTION_NODE_TEMPLATE_CATEGORIES = [
+    {
+        "title": "智能采集",
+        "nodes": [
+            {
+                "type": "multi-doc-upload",
+                "label": "多文档智能上传",
+                "description": "批量上传 PDF/图片并执行智能解析。",
+                "fields": [
+                    {"name": "batch_name", "label": "批次名称", "type": "text", "required": True},
+                    {"name": "upload_time", "label": "上传时间", "type": "date", "required": True},
+                ],
+            }
+        ],
+    },
+    {
+        "title": "检测前信息",
+        "nodes": [
+            {
+                "type": "delegate-info",
+                "label": "委托方资料",
+                "description": "记录委托单位与项目基础信息。",
+                "fields": [
+                    {"name": "project_name", "label": "项目名称", "type": "text", "required": True},
+                    {"name": "delegate_unit", "label": "委托单位", "type": "text", "required": True},
+                    {"name": "contact_person", "label": "联系人", "type": "text", "required": True},
+                ],
+            }
+        ],
+    },
+    {
+        "title": "检测中数据",
+        "nodes": [
+            {
+                "type": "mortar-strength",
+                "label": "砂浆强度",
+                "description": "砂浆强度检测数据。",
+                "fields": [
+                    {"name": "test_location", "label": "测试位置", "type": "text", "required": True},
+                    {"name": "strength_value", "label": "强度值(MPa)", "type": "number", "required": True},
+                ],
+            },
+            {
+                "type": "concrete-strength",
+                "label": "混凝土强度",
+                "description": "混凝土抗压强度检测数据。",
+                "fields": [
+                    {"name": "specimen_number", "label": "试块编号", "type": "text", "required": True},
+                    {"name": "compressive_strength", "label": "抗压强度(MPa)", "type": "number", "required": True},
+                ],
+            },
+            {
+                "type": "brick-strength",
+                "label": "砖强度",
+                "description": "砖块强度检测数据。",
+                "fields": [
+                    {"name": "strength_grade", "label": "强度等级", "type": "text", "required": True},
+                    {"name": "compressive_strength", "label": "抗压强度(MPa)", "type": "number", "required": True},
+                ],
+            },
+            {
+                "type": "rebar-diameter",
+                "label": "钢筋直径",
+                "description": "钢筋直径测量数据。",
+                "fields": [
+                    {"name": "location", "label": "位置", "type": "text", "required": True},
+                    {"name": "diameter", "label": "直径(mm)", "type": "number", "required": True},
+                ],
+            },
+            {
+                "type": "inclination",
+                "label": "倾斜测量",
+                "description": "建筑倾斜度测量数据。",
+                "fields": [
+                    {"name": "measurement_point", "label": "测量点", "type": "text", "required": True},
+                    {"name": "inclination_angle", "label": "倾斜角度", "type": "number", "required": True},
+                ],
+            },
+            {
+                "type": "material-test",
+                "label": "材料检测",
+                "description": "通用材料检测数据。",
+                "fields": [
+                    {"name": "material_name", "label": "材料名称", "type": "text", "required": True},
+                    {"name": "test_result", "label": "检测结果", "type": "text", "required": True},
+                ],
+            },
+            {
+                "type": "site-inspection",
+                "label": "现场情况检查",
+                "description": "现场检查记录。",
+                "fields": [
+                    {"name": "inspection_location", "label": "检查位置", "type": "text", "required": True},
+                    {"name": "site_condition", "label": "现场情况", "type": "text", "required": True},
+                ],
+            },
+        ],
+    },
+    {
+        "title": "检测后数据",
+        "nodes": [
+            {
+                "type": "software-calculation",
+                "label": "软件计算结果",
+                "description": "结构计算软件结果。",
+                "fields": [
+                    {"name": "mortar_strength_mpa", "label": "砂浆强度取值", "type": "number", "required": False},
+                    {"name": "brick_strength_grade", "label": "砖强度等级", "type": "text", "required": False},
+                ],
+            }
+        ],
+    },
+]
+
 DEFAULT_PROMPT = """# 回弹法检测表结构化抽取 Skill Prompt（稳定性优先）
 
 ## 角色
@@ -176,6 +290,12 @@ def _parse_chunk_pages(chunk_id: str, selection: dict, total_pages: int) -> Opti
         except ValueError:
             return None
     return None
+
+
+@router.get("/collection/node-templates")
+async def list_collection_node_templates():
+    """Return collection node template categories for frontend rendering."""
+    return {"categories": COLLECTION_NODE_TEMPLATE_CATEGORIES}
 
 
 @router.post("/collection/upload")

@@ -1,0 +1,18 @@
+﻿{
+  "categories": [
+    {
+      "title": "智能采集",
+      "nodes": [
+        {
+          "type": "multi-doc-upload",
+          "label": "多文档智能上传",
+          "description": "批量上传 PDF/图片并执行智能解析。",
+          "fields": [
+            { "name": "batch_name", "label": "批次名称", "type": "text", "required": true },
+            { "name": "upload_time", "label": "上传时间", "type": "date", "required": true }
+          ]
+        }
+      ]
+    }
+  ]
+}

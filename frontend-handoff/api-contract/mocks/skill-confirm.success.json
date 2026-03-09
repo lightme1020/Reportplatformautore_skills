@@ -1,0 +1,14 @@
+﻿{
+  "success": true,
+  "run_id": "6b6f11f6-8b8f-4f12-b249-cc63aaaf0b18",
+  "records": [
+    {
+      "record_id": "db-record-001",
+      "status": "success",
+      "data": {
+        "table_id": "KSQR-4.13-XC-10",
+        "commission_id": "No:20260308-11"
+      }
+    }
+  ]
+}

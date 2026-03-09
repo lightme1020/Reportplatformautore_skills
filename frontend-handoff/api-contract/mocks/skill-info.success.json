@@ -1,0 +1,9 @@
+﻿{
+  "name": "mortar_table_recognition",
+  "type": "declarative",
+  "display_name": "砂浆强度表格识别",
+  "description": "从砂浆强度检测报告表格中提取结构化字段。",
+  "version": "1.0.0",
+  "has_script": true,
+  "group": "info_collection"
+}

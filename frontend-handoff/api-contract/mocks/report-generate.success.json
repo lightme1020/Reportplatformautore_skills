@@ -1,0 +1,33 @@
+﻿{
+  "report_id": "4a72f0ea-3f4c-4bca-b8b0-4f179ea6b5c7",
+  "chapters": [
+    {
+      "chapter_id": "chapter-1",
+      "title": "材料强度检测结果",
+      "chapter_content": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "本章依据采集数据生成，示例文本。"
+          },
+          {
+            "type": "table",
+            "title": "砂浆强度统计",
+            "columns": [
+              { "key": "location", "label": "部位" },
+              { "key": "value", "label": "强度(MPa)" }
+            ],
+            "rows": [
+              { "location": "A1", "value": "31.2" },
+              { "location": "A2", "value": "30.4" }
+            ]
+          }
+        ]
+      },
+      "summary": {
+        "dataset_key": "mortar_strength"
+      },
+      "evidence_refs": []
+    }
+  ]
+}

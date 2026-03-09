@@ -1,0 +1,29 @@
+﻿{
+  "success": true,
+  "error": null,
+  "data": [
+    {
+      "table_id": "KSQR-4.13-XC-10",
+      "commission_id": "No:20260308-11",
+      "test_date": "2026-03-10",
+      "rows": [
+        { "seq": "1", "test_location": "A1", "converted_strength_mpa": "31.2", "estimated_strength_mpa": "29.8" }
+      ]
+    }
+  ],
+  "records": [
+    {
+      "chunk_id": "skill-1",
+      "status": "skipped",
+      "record_id": null,
+      "data": {
+        "table_id": "KSQR-4.13-XC-10"
+      },
+      "error": null
+    }
+  ],
+  "metadata": {},
+  "script_result": { "success": true },
+  "run_id": "57d13ef5-4f79-4cd7-bd86-d13e0f2d0011",
+  "source_hash": "sha256-demo"
+}

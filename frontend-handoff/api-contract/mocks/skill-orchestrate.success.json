@@ -1,0 +1,38 @@
+﻿{
+  "total_files": 1,
+  "successful": 1,
+  "failed": 0,
+  "results": [
+    {
+      "file_name": "建材新村.pdf",
+      "classification": {
+        "file_type": "mortar",
+        "skill_name": "mortar_table_recognition",
+        "confidence": 0.95,
+        "reasoning": "检测到砂浆强度相关字段"
+      },
+      "success": true,
+      "error": null,
+      "data": [
+        {
+          "table_id": "KSQR-4.13-XC-10",
+          "rows": [
+            { "seq": "1", "test_location": "A1", "converted_strength_mpa": "31.2", "estimated_strength_mpa": "29.8" }
+          ]
+        }
+      ],
+      "records": [
+        {
+          "chunk_id": "skill-1",
+          "status": "skipped",
+          "record_id": null,
+          "data": { "table_id": "KSQR-4.13-XC-10" },
+          "table_type": null,
+          "error": null
+        }
+      ],
+      "run_id": "f2f0f4ef-7426-4fee-bde5-cb90f15df819",
+      "source_hash": "sha256-demo"
+    }
+  ]
+}
